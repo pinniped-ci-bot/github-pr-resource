@@ -34,6 +34,19 @@ type FakeGithub struct {
 		result1 []resource.ChangedFileObject
 		result2 error
 	}
+	GetPublicOrganizationsStub        func(string) ([]string, error)
+	getPublicOrganizationsMutex       sync.RWMutex
+	getPublicOrganizationsArgsForCall []struct {
+		arg1 string
+	}
+	getPublicOrganizationsReturns struct {
+		result1 []string
+		result2 error
+	}
+	getPublicOrganizationsReturnsOnCall map[int]struct {
+		result1 []string
+		result2 error
+	}
 	GetPullRequestStub        func(string, string) (*resource.PullRequest, error)
 	getPullRequestMutex       sync.RWMutex
 	getPullRequestArgsForCall []struct {
@@ -226,6 +239,69 @@ func (fake *FakeGithub) GetChangedFilesReturnsOnCall(i int, result1 []resource.C
 	}
 	fake.getChangedFilesReturnsOnCall[i] = struct {
 		result1 []resource.ChangedFileObject
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeGithub) GetPublicOrganizations(arg1 string) ([]string, error) {
+	fake.getPublicOrganizationsMutex.Lock()
+	ret, specificReturn := fake.getPublicOrganizationsReturnsOnCall[len(fake.getPublicOrganizationsArgsForCall)]
+	fake.getPublicOrganizationsArgsForCall = append(fake.getPublicOrganizationsArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetPublicOrganizations", []interface{}{arg1})
+	fake.getPublicOrganizationsMutex.Unlock()
+	if fake.GetPublicOrganizationsStub != nil {
+		return fake.GetPublicOrganizationsStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.getPublicOrganizationsReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeGithub) GetPublicOrganizationsCallCount() int {
+	fake.getPublicOrganizationsMutex.RLock()
+	defer fake.getPublicOrganizationsMutex.RUnlock()
+	return len(fake.getPublicOrganizationsArgsForCall)
+}
+
+func (fake *FakeGithub) GetPublicOrganizationsCalls(stub func(string) ([]string, error)) {
+	fake.getPublicOrganizationsMutex.Lock()
+	defer fake.getPublicOrganizationsMutex.Unlock()
+	fake.GetPublicOrganizationsStub = stub
+}
+
+func (fake *FakeGithub) GetPublicOrganizationsArgsForCall(i int) string {
+	fake.getPublicOrganizationsMutex.RLock()
+	defer fake.getPublicOrganizationsMutex.RUnlock()
+	argsForCall := fake.getPublicOrganizationsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeGithub) GetPublicOrganizationsReturns(result1 []string, result2 error) {
+	fake.getPublicOrganizationsMutex.Lock()
+	defer fake.getPublicOrganizationsMutex.Unlock()
+	fake.GetPublicOrganizationsStub = nil
+	fake.getPublicOrganizationsReturns = struct {
+		result1 []string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeGithub) GetPublicOrganizationsReturnsOnCall(i int, result1 []string, result2 error) {
+	fake.getPublicOrganizationsMutex.Lock()
+	defer fake.getPublicOrganizationsMutex.Unlock()
+	fake.GetPublicOrganizationsStub = nil
+	if fake.getPublicOrganizationsReturnsOnCall == nil {
+		fake.getPublicOrganizationsReturnsOnCall = make(map[int]struct {
+			result1 []string
+			result2 error
+		})
+	}
+	fake.getPublicOrganizationsReturnsOnCall[i] = struct {
+		result1 []string
 		result2 error
 	}{result1, result2}
 }
@@ -558,6 +634,8 @@ func (fake *FakeGithub) Invocations() map[string][][]interface{} {
 	defer fake.deletePreviousCommentsMutex.RUnlock()
 	fake.getChangedFilesMutex.RLock()
 	defer fake.getChangedFilesMutex.RUnlock()
+	fake.getPublicOrganizationsMutex.RLock()
+	defer fake.getPublicOrganizationsMutex.RUnlock()
 	fake.getPullRequestMutex.RLock()
 	defer fake.getPullRequestMutex.RUnlock()
 	fake.listModifiedFilesMutex.RLock()

@@ -25,6 +25,7 @@ type Source struct {
 	GitCryptKey             string                      `json:"git_crypt_key"`
 	BaseBranch              string                      `json:"base_branch"`
 	RequiredReviewApprovals int                         `json:"required_review_approvals"`
+	TrustedOrgs             []string                    `json:"trusted_orgs"`
 	Labels                  []string                    `json:"labels"`
 	States                  []githubv4.PullRequestState `json:"states"`
 }
@@ -114,6 +115,9 @@ type PullRequestObject struct {
 	State             githubv4.PullRequestState
 	ClosedAt          githubv4.DateTime
 	MergedAt          githubv4.DateTime
+	Author            struct {
+		Login string
+	}
 }
 
 // UpdatedDate returns the last time a PR was updated, either by commit

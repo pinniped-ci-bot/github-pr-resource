@@ -2,6 +2,7 @@ package resource
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -80,7 +81,9 @@ Loop:
 
 		// Filter pull request if it does not have the required number of approved review(s).
 		if p.ApprovedReviewCount < request.Source.RequiredReviewApprovals {
-			continue
+			if !authorIsInTrustedOrg(p, request.Source.TrustedOrgs, manager) {
+				continue
+			}
 		}
 
 		// Fetch files once if paths/ignore_paths are specified.
@@ -136,6 +139,36 @@ Loop:
 		response = CheckResponse{response[len(response)-1]}
 	}
 	return response, nil
+}
+
+func authorIsInTrustedOrg(p *PullRequest, trustedOrgs []string, manager Github) bool {
+	if len(trustedOrgs) == 0 {
+		return false
+	}
+
+	author := p.Author.Login
+	publicOrgs, err := manager.GetPublicOrganizations(author)
+	if err != nil {
+		log.Printf("unable to get public orgs for author %q in %s: %v", author, p.URL, err)
+		return false
+	}
+
+	inTrustedOrgs := func(publicOrg string) bool {
+		for _, trustedOrg := range trustedOrgs {
+			if publicOrg == trustedOrg {
+				return true
+			}
+		}
+		return false
+	}
+
+	for _, publicOrg := range publicOrgs {
+		if inTrustedOrgs(publicOrg) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // ContainsSkipCI returns true if a string contains [ci skip] or [skip ci].

@@ -49,6 +49,7 @@ func Get(request GetRequest, github Github, git Git, outputDir string) (*GetResp
 	metadata.Add("base_name", pull.BaseRefName)
 	metadata.Add("base_sha", baseSHA)
 	metadata.Add("message", pull.Tip.Message)
+	metadata.Add("pr_author", pull.Author.Login)
 	metadata.Add("author", pull.Tip.Author.User.Login)
 	metadata.Add("author_email", pull.Tip.Author.Email)
 	metadata.Add("state", string(pull.State))

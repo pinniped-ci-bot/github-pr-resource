@@ -27,6 +27,7 @@ type Github interface {
 	GetChangedFiles(string, string) ([]ChangedFileObject, error)
 	UpdateCommitStatus(string, string, string, string, string, string) error
 	DeletePreviousComments(string) error
+	GetPublicOrganizations(author string) ([]string, error)
 }
 
 // GithubClient for handling requests to the Github V3 and V4 APIs.
@@ -412,4 +413,19 @@ func parseRepository(s string) (string, string, error) {
 		return "", "", errors.New("malformed repository")
 	}
 	return parts[0], parts[1], nil
+}
+
+func (m *GithubClient) GetPublicOrganizations(author string) ([]string, error) {
+	orgs, _, err := m.V3.Organizations.List(context.TODO(), author, nil)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]string, 0, len(orgs))
+	for _, org := range orgs {
+		if org == nil || org.Login == nil {
+			continue
+		}
+		out = append(out, *org.Login)
+	}
+	return out, nil
 }
