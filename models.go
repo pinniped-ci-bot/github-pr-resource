@@ -26,6 +26,7 @@ type Source struct {
 	BaseBranch              string                      `json:"base_branch"`
 	RequiredReviewApprovals int                         `json:"required_review_approvals"`
 	TrustedOrgs             []string                    `json:"trusted_orgs"`
+	TrustedUsers            []string                    `json:"trusted_users"`
 	Labels                  []string                    `json:"labels"`
 	States                  []githubv4.PullRequestState `json:"states"`
 }

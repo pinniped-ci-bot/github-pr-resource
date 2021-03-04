@@ -81,7 +81,7 @@ Loop:
 
 		// Filter pull request if it does not have the required number of approved review(s).
 		if p.ApprovedReviewCount < request.Source.RequiredReviewApprovals {
-			if !authorIsInTrustedOrg(p, request.Source.TrustedOrgs, manager) {
+			if !(authorIsTrusted(p, request.Source.TrustedUsers, manager) || authorIsInTrustedOrg(p, request.Source.TrustedOrgs, manager)) {
 				continue
 			}
 		}
@@ -168,6 +168,19 @@ func authorIsInTrustedOrg(p *PullRequest, trustedOrgs []string, manager Github) 
 		}
 	}
 
+	return false
+}
+
+func authorIsTrusted(p *PullRequest, trustedUsers []string, manager Github) bool {
+	if len(trustedUsers) == 0 {
+		return false
+	}
+	author := p.Author.Login
+	for _, trustedUser := range trustedUsers {
+		if author == trustedUser {
+			return true
+		}
+	}
 	return false
 }
 
